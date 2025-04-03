@@ -1,19 +1,34 @@
 import asyncio
+from pygame import Vector2
 import websockets
 import json
 
-from server.Game import Game
+from server.Tank.Tank import Tank
+
+
 class WSController():
     def __init__(self):
         self.active_connections = set()
-        self.con_to_nickname = {}
+        self.con_to_id = {}
+        self.id_players_dict = {}
 
     async def remove_connection(self, websocket):
-        if websocket in self.con_to_nickname:
-            nickname = self.con_to_nickname[websocket]
-            del self.con_to_nickname[websocket]
-            await self.send_message_to_all({"content": "disconnect", "nickname": nickname})
-        self.active_connections.discard(websocket)
+        try:
+            player_id = self.con_to_id.get(websocket)
+            self.active_connections.discard(websocket)
+            
+            if websocket in self.con_to_id:
+                del self.con_to_id[websocket]
+            
+            if player_id in self.id_players_dict:
+                del self.id_players_dict[player_id]
+                
+                
+            print(f"{len(self.active_connections)} {len(self.con_to_id)} {len(self.id_players_dict)}")
+                
+        except Exception as e:
+            print(f"Error removing connection: {e}")
+            
 
     async def send_message(self, websocket, message):
         try:
@@ -30,12 +45,10 @@ class WSController():
     async def validate_message(self, data):
         if not isinstance(data, dict):
             raise ValueError("Invalid message format")
-        if 'nickname' not in data or 'content' not in data:
-            raise ValueError("Missing required fields: nickname and content")
-        if not data['nickname'].strip():
-            raise ValueError("Nickname cannot be empty")
-        if not data['content'].strip():
-            raise ValueError("Message content cannot be empty")
+        if 'nickname' not in data or 'direction' not in data:
+            raise ValueError("Missing required fields: nickname and direction")
+        if not data['direction'].strip():
+            raise ValueError("Message direction cannot be empty")
 
     async def websocket_handler(self, websocket, path=""):
         print("Server started on ws://localhost:8765")
@@ -44,14 +57,15 @@ class WSController():
             async for message in websocket:
                 try:
                     data = json.loads(message)
-                    await self.validate_message(data)
-                    
-                    nickname = data['nickname']
-                    message_content = data['content']
-                    self.con_to_nickname[websocket] = nickname
-                    print(f"{nickname} sending: {message_content}")
-                    await asyncio.gather(*[self.send_message(con, data) for con in self.active_connections if con != websocket])
-
+                    #await self.validate_message(data)
+                        
+                    if 'direction' in data:
+                        x,y = data['direction']
+                        player_id = self.con_to_id[websocket]
+                        player: Tank = self.id_players_dict[player_id]
+                        player.direction = Vector2(x, y)
+                        player.shoot_flag = data['shoot']
+                        
                 except Exception as e:
                     print(f"Unexpected error: {str(e)}")
                     await websocket.send(json.dumps({
@@ -60,12 +74,11 @@ class WSController():
                     }))
 
         except websockets.exceptions.ConnectionClosed:
-            print(f"User {self.con_to_nickname.get(websocket, 'Unknown')} disconnected")
             await self.remove_connection(websocket)
 
-        
 async def main():
     wsController = WSController()
+    from server.Game import Game
     game = Game(wsController)
     server_task = websockets.serve(wsController.websocket_handler, "localhost", 8765)
 

@@ -1,4 +1,6 @@
+import asyncio
 import pygame
+
 
 from client.Tank.ControlledTank import ControlledTank
 from client.Tank.Control import Control, Keyset
@@ -6,15 +8,15 @@ from client.Field import Field
 
 
 class Game():
-    def __init__(self, ws):
-        self.ws = ws
+    def __init__(self, wsHandler):
+        from Client import WSHandler
+        self.wsHandler: WSHandler = wsHandler
         
-    
     async def start_game(self):
         pygame.init()
         screen = pygame.display.set_mode((600, 600))
         pygame.display.set_caption("World Of Tanks")
-        field = Field()
+        field = Field(self.wsHandler)
         player_wasd_keyset = Keyset(
             key_up = pygame.K_w,
             key_down = pygame.K_s,
@@ -24,11 +26,10 @@ class Game():
             )
     
         controllerWASD = Control(player_wasd_keyset)
-        player = ControlledTank(controller=controllerWASD, ws = self.ws)
+        player = ControlledTank(controller=controllerWASD, wsHandler = self.wsHandler)
         player.position = pygame.Vector2(300,300)
-        field.tank_list.add(player)
+        field.player = player
         
-        clock = pygame.time.Clock()
         running = True
         while running:
             for event in pygame.event.get():
@@ -39,6 +40,6 @@ class Game():
             field.draw(screen)
 
             pygame.display.flip()
-            clock.tick(60)
+            await asyncio.sleep(1/60)
 
         pygame.quit()

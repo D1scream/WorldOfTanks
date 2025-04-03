@@ -2,21 +2,25 @@ import json
 import time
 from pygame import Vector2
 import pygame
+
 from client.Tank.Control import Control
 from client.Tank.Tank import Tank
 
 
 class ControlledTank(Tank):
-    def __init__(self, controller: Control, ws, rotate=Vector2(0, 1), x=0, y=0):
-        super().__init__(rotate, x, y)
+    def __init__(self, controller: Control, wsHandler, position=Vector2(0,0), rotate=Vector2(0, 1), direction=None):
+        super().__init__(rotate, position=position)
         self.controller: Control = controller
-        self.rotation_speed: float = 10
-        self.ws = ws
+        self.rotation_speed: float = 1
+        self.rotate = rotate
+        from Client import WSHandler
+        self.wsHandler: WSHandler  = wsHandler
         self.last_shoot_time = time.time()
+        self.direction = direction
 
     def move(self):
         direction = self.controller.get_moving_vector()
-        new_direction = direction
+        new_direction = direction.copy()
         if direction.x: 
             self.rotate = self.rotate.rotate(direction.x * self.rotation_speed)
             direction.x = 0  
@@ -34,7 +38,10 @@ class ControlledTank(Tank):
         
     async def update(self):
         dir = self.move()
-        self.ws.send({"direction": [dir.x, dir.y], "shoot": self.check_shoot()})
+        await self.wsHandler.send_message(json.dumps({'direction': [dir.x, dir.y], 'shoot': self.check_shoot()}))
+    
+    def draw(self, screen):
+        pass
         
         
     

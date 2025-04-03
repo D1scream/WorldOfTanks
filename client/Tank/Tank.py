@@ -6,29 +6,28 @@ from client.Projectile import Projectile
 
 
 class Tank():
-    def __init__(self, rotate=Vector2(0, 0), x=0, y=0):
+    def __init__(self, id, rotate=Vector2(0, 1), position=None, direction=None):
         self.speed: float = 10
-        self.position: Vector2 = Vector2(x,y)
+        self.position: Vector2 = position
         self.rotate: Vector2 = rotate
-    
+        self.id = id
+        self.direction = direction
+        
     def shoot(self):
-        # Вычисляем смещение по направлению поворота
         angle = math.atan2(self.rotate.y, self.rotate.x)
         distance = 20
         offset_x = math.cos(angle) * distance
         offset_y = math.sin(angle) * distance
 
-        # Новая позиция снаряда
         projectile_position = self.position + Vector2(offset_x, offset_y)
 
-        # Создаем снаряд
         projectile = Projectile(x=projectile_position.x, y=projectile_position.y, rotate=self.rotate)
         return projectile
         
     def move(self):
         self.position += self.position + self.rotate.normalize()*self.speed
         
-    def update(self):
+    async def update(self):
         pass
     
     def draw(self, screen):

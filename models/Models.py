@@ -1,7 +1,7 @@
 import json
 
 from server.Projectile import Projectile
-from server.Tank import Tank
+from server.Tank.Tank import Tank
 
 class ProjectileListModel:
     def __init__(self, projectile_list: list[Projectile]):
