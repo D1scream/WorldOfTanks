@@ -1,17 +1,19 @@
 import pygame
-from Field import Field
-from Tank.ControlledTank import ControlledTank
-from Tank.Control import Control, Keyset
+
+from client.Tank.ControlledTank import ControlledTank
+from client.Tank.Control import Control, Keyset
+from client.Field import Field
 
 
 class Game():
-    def __init__(self):
+    def __init__(self, ws):
         self.start_game()
+        self.ws = ws
     
     def start_game(self):
         pygame.init()
         screen = pygame.display.set_mode((600, 600))
-        pygame.display.set_caption("Tank Game")
+        pygame.display.set_caption("World Of Tanks")
         field = Field()
         player_wasd_keyset = Keyset(
             key_up = pygame.K_w,
@@ -22,11 +24,11 @@ class Game():
             )
     
         controllerWASD = Control(player_wasd_keyset)
-        player = ControlledTank(controller=controllerWASD)
+        player = ControlledTank(controller=controllerWASD, ws = self.ws)
         player.position = pygame.Vector2(300,300)
         field.tank_list.add(player)
         
-        clock = clock = pygame.time.Clock()
+        clock = pygame.time.Clock()
         running = True
         while running:
             for event in pygame.event.get():
@@ -40,5 +42,3 @@ class Game():
             clock.tick(60)
 
         pygame.quit()
-
-game = Game()

@@ -1,14 +1,17 @@
+import time
 from pygame import Vector2
 import pygame
-from Tank.Control import Control
-from Tank.Tank import Tank
+from client.Tank.Control import Control
+from client.Tank.Tank import Tank
 
 
 class ControlledTank(Tank):
-    def __init__(self, controller: Control, rotate=Vector2(0, 1), x=0, y=0):
+    def __init__(self, controller: Control, ws, rotate=Vector2(0, 1), x=0, y=0):
         super().__init__(rotate, x, y)
         self.controller: Control = controller
         self.rotation_speed: float = 10
+        self.ws = ws
+        self.last_shoot_time = time.time()
 
     def move(self):
         direction = self.controller.get_moving_vector()
@@ -22,7 +25,8 @@ class ControlledTank(Tank):
     def check_shoot(self):
         keys = pygame.key.get_pressed()
         if(self.controller.get_shoot(keys)):
-            return self.shoot()
+            if(time.time() - self.last_shoot_time > 1):
+                return self.shoot()
         else:
             return None
         

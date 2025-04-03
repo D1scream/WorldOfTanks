@@ -1,8 +1,9 @@
-from Projectile import Projectile
-from Tank.Tank import Tank
+from client.Projectile import Projectile
+from client.Tank.Tank import Tank
 
 
 class Field():
+
     def __init__(self):
         self.width: int = 600
         self.height: int = 600
