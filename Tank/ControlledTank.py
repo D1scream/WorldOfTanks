@@ -12,11 +12,8 @@ class ControlledTank(Tank):
 
     def move(self):
         direction = self.controller.get_moving_vector()
-        print("suu")
         if direction.x: 
-            print("rot ",self.rotate)
             self.rotate = self.rotate.rotate(direction.x * self.rotation_speed)
-            print(self.rotate)
             direction.x = 0  
         
         direction = self.rotate * self.speed * direction.y * -1
