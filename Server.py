@@ -38,6 +38,7 @@ class WSController():
             raise ValueError("Message content cannot be empty")
 
     async def websocket_handler(self, websocket, path=""):
+        print("Server started on ws://localhost:8765")
         self.active_connections.add(websocket)
         try:
             async for message in websocket:
@@ -62,13 +63,15 @@ class WSController():
             print(f"User {self.con_to_nickname.get(websocket, 'Unknown')} disconnected")
             await self.remove_connection(websocket)
 
+        
 async def main():
     wsController = WSController()
     game = Game(wsController)
-    asyncio.create_task(game.start_game()) 
-    server = await websockets.serve(wsController.websocket_handler, "localhost", 8765)
+    server_task = websockets.serve(wsController.websocket_handler, "localhost", 8765)
+
+    server = await server_task
     print("Server started on ws://localhost:8765")
-    await server.wait_closed()
-    
+    await asyncio.gather(server.wait_closed(), game.start_game())
+
 if __name__ == "__main__":
     asyncio.run(main())

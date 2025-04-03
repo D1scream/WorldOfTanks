@@ -1,3 +1,4 @@
+import json
 import time
 from pygame import Vector2
 import pygame
@@ -15,24 +16,26 @@ class ControlledTank(Tank):
 
     def move(self):
         direction = self.controller.get_moving_vector()
+        new_direction = direction
         if direction.x: 
             self.rotate = self.rotate.rotate(direction.x * self.rotation_speed)
             direction.x = 0  
         
         direction = self.rotate * self.speed * direction.y * -1
         self.position += direction 
+        return new_direction
     
     def check_shoot(self):
         keys = pygame.key.get_pressed()
         if(self.controller.get_shoot(keys)):
-            if(time.time() - self.last_shoot_time > 1):
-                return self.shoot()
+            return True
         else:
-            return None
+            return False
         
-    def update(self):
-        self.move()
-        return self.check_shoot()
+    async def update(self):
+        dir = self.move()
+        self.ws.send({"direction": [dir.x, dir.y], "shoot": self.check_shoot()})
+        
         
     
     
