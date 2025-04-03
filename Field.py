@@ -25,7 +25,6 @@ class Field():
             self.projectile_list.remove(projectile)
             
     
-    
     def draw(self, screen):
         screen.fill((0, 0, 0))
         

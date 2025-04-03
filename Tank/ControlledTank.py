@@ -1,19 +1,18 @@
 from pygame import Vector2
 import pygame
-from Projectile import Projectile
-from Tank.Controller import Controller
+from Tank.Control import Control
 from Tank.Tank import Tank
 
 
 class ControlledTank(Tank):
-    def __init__(self, controller: Controller, rotate=Vector2(0, 1), x=0, y=0):
+    def __init__(self, controller: Control, rotate=Vector2(0, 1), x=0, y=0):
         super().__init__(rotate, x, y)
-        self.controller: Controller = controller
+        self.controller: Control = controller
         self.rotation_speed: float = 10
 
     def move(self):
-        direction = self.get_direction_from_keys()
-        
+        direction = self.controller.get_moving_vector()
+        print("suu")
         if direction.x: 
             print("rot ",self.rotate)
             self.rotate = self.rotate.rotate(direction.x * self.rotation_speed)
@@ -22,10 +21,6 @@ class ControlledTank(Tank):
         
         direction = self.rotate * self.speed * direction.y * -1
         self.position += direction 
-
-    def get_direction_from_keys(self):
-        keys = pygame.key.get_pressed()
-        return self.controller.get_moving_vector(keys)
     
     def check_shoot(self):
         keys = pygame.key.get_pressed()

@@ -1,3 +1,4 @@
+
 import math
 from pygame import Vector2
 import pygame
@@ -11,8 +12,17 @@ class Tank():
         self.rotate: Vector2 = rotate
     
     def shoot(self):
-        # TODO : расстояние от танка для стрельбы
-        projectile = Projectile(x=self.position.x, y=self.position.y, rotate=self.rotate)
+        # Вычисляем смещение по направлению поворота
+        angle = math.atan2(self.rotate.y, self.rotate.x)
+        distance = 20
+        offset_x = math.cos(angle) * distance
+        offset_y = math.sin(angle) * distance
+
+        # Новая позиция снаряда
+        projectile_position = self.position + Vector2(offset_x, offset_y)
+
+        # Создаем снаряд
+        projectile = Projectile(x=projectile_position.x, y=projectile_position.y, rotate=self.rotate)
         return projectile
         
     def move(self):

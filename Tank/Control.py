@@ -8,11 +8,12 @@ class Keyset():
         self.action_right = key_right
         self.action_division = key_division
 
-class Controller:
+class Control:
     def __init__(self, keyset: Keyset):
         self.keyset = keyset
 
-    def get_moving_vector(self, keys):
+    def get_moving_vector(self):
+        keys = pygame.key.get_pressed()
         direction = pygame.math.Vector2(0, 0)
         if keys[self.keyset.action_up]: direction.y = -1
         if keys[self.keyset.action_down]: direction.y = 1

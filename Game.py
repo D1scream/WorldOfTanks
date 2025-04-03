@@ -1,7 +1,7 @@
 import pygame
 from Field import Field
 from Tank.ControlledTank import ControlledTank
-from Tank.Controller import Controller, Keyset
+from Tank.Control import Control, Keyset
 
 
 class Game():
@@ -21,7 +21,7 @@ class Game():
             key_division = pygame.K_SPACE
             )
     
-        controllerWASD = Controller(player_wasd_keyset)
+        controllerWASD = Control(player_wasd_keyset)
         player = ControlledTank(controller=controllerWASD)
         player.position = pygame.Vector2(300,300)
         field.tank_list.add(player)
