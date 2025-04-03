@@ -10,9 +10,7 @@ WINDOW_HEIGHT = 600
 async def receive_messages(ws):
     async for message in ws:
         try:
-            data = json.loads(message)
-            print(f"\n{data['nickname']}: {data['content']}")
-            print("enter message:", end=" ")               
+            data = json.loads(message)             
         except Exception as e:
             print(f"Error receiving message: {e}")
 
@@ -20,8 +18,9 @@ async def send_message(ws, message):
     await ws.send(json.dumps(message))
 
 async def startGame(ws):
-    nickname = input("MyCoolNick")
+    nickname = "MyCoolNick"
     game = Game(ws)
+    await game.start_game()
 
 async def main():
     ws = await websockets.connect("ws://localhost:8765")

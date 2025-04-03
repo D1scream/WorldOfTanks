@@ -7,10 +7,10 @@ from client.Field import Field
 
 class Game():
     def __init__(self, ws):
-        self.start_game()
         self.ws = ws
+        
     
-    def start_game(self):
+    async def start_game(self):
         pygame.init()
         screen = pygame.display.set_mode((600, 600))
         pygame.display.set_caption("World Of Tanks")
@@ -35,7 +35,7 @@ class Game():
                 if event.type == pygame.QUIT:
                     running = False
 
-            field.update()
+            await field.update()
             field.draw(screen)
 
             pygame.display.flip()

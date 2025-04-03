@@ -10,9 +10,9 @@ class Field():
         self.tank_list: set[Tank] = set()
         self.projectile_list: set[Projectile] = set()
         
-    def update(self):
+    async def update(self):
         for tank in self.tank_list:
-            projectile = tank.update()
+            projectile = await tank.update()
             if projectile:
                 self.projectile_list.add(projectile)
             
