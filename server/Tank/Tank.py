@@ -21,7 +21,7 @@ class Tank():
         if self.shoot_flag:
             self.shoot_flag = False
             if(self.last_shoot_time == 0):
-                self.last_shoot_time +=60
+                self.last_shoot_time += 60
                 angle = math.atan2(self.rotate.y, self.rotate.x)
                 distance = 20
                 offset_x = math.cos(angle) * distance
@@ -38,8 +38,6 @@ class Tank():
         direction = self.direction
         if direction.x: 
             self.rotate = self.rotate.rotate(direction.x * self.rotation_speed) 
-            
-        
         dm = self.rotate * self.speed * direction.y * -1
         self.position += dm
         
